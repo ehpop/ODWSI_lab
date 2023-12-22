@@ -29,7 +29,7 @@ def mapper_enrypt(blocks):
     cipher_text = mp.output_data
     block_size = mp.block_size
     iv = mp.iv
-    des = DES.new(mp.key, DES.MODE_CTR, nonce=b"", initial_value=iv)
+    des = DES.new(key=mp.key, mode=DES.MODE_CTR, nonce=b"", initial_value=iv)
 
     for i in blocks:
         offset = i * block_size
@@ -44,7 +44,7 @@ def mapper_decrypt(blocks):
     plain_text = mp.output_data
     block_size = mp.block_size
     iv = mp.iv
-    des = DES.new(mp.key, DES.MODE_CTR, nonce=b"", initial_value=iv)
+    des = DES.new(key=mp.key, mode=DES.MODE_CTR, nonce=b"", initial_value=iv)
 
     for i in blocks:
         offset = i * block_size
@@ -134,15 +134,28 @@ def print_results(times_encryption, times_decryption):
         print(f"Message size: {size:_}, time: {time:.2f}s")
 
 
+def pad_message(message):
+    padding_length = BLOCK_SIZE - len(message) % BLOCK_SIZE
+    padding = bytes([padding_length] * padding_length)
+    return message + padding
+
+
+def unpad_message(padded_message):
+    padding_length = padded_message[-1]
+    message = padded_message[:-padding_length]
+    return message
+
+
 if __name__ == "__main__":
     key = b"haslo123"
     iv = get_random_bytes(8)
-    plain_text = b"ala ma kota" * int(100_000_000 / len(b"ala ma kota"))
+    # plain_text = b"ala ma kota" * int(10_000_000 / len(b"ala ma kota"))
 
-    encrypted, encrypt_time = encrypt_message_time(key, iv, plain_text)
-    print(f"Encrypted: {encrypted[-10:]}")
+    plain_text = b"""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, quam ac ultricies ultricies,"""
+    encrypted, encrypt_time = encrypt_message_time(key, iv, pad_message(plain_text))
+    print(f"Encrypted: {encrypted}")
     print(f"Encrypt time: {encrypt_time}")
 
     decrypted, decrypt_time = decrypt_message_time(key, iv, encrypted)
-    print(f"Decrypted: {decrypted[-10:]}")
+    print(f"Decrypted: {unpad_message(decrypted)}")
     print(f"Decrypt time: {decrypt_time}")

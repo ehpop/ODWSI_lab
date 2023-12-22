@@ -3,7 +3,7 @@ from Crypto.Random import get_random_bytes
 import multiprocessing as mp
 import time
 
-BLOCK_SIZE = 8  # Use 16 for AES
+BLOCK_SIZE = 8
 
 
 def pad_message(message):
@@ -78,7 +78,7 @@ def print_results(times_encryption, times_decryption):
 if __name__ == "__main__":
     key = b"haslo123"
     iv = get_random_bytes(8)
-    plain_text = b"ala ma kota" * int(100_000_000 / len(b"ala ma kota"))
+    plain_text = b"ala ma kota" * int(10_000_000 / len(b"ala ma kota"))
 
     stime = time.time()
     encrypted = encrypt_message(key, plain_text, iv)
